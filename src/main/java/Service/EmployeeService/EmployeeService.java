@@ -1,15 +1,12 @@
 package Service.EmployeeService;
 
-public class EmployeeService {
-    public static void addEmployee(){
-        System.out.println("Thêm nhân viên");
-    }
+import DAO.EmployeeDAO.EmployeeDAO;
+import Model.Employee;
+import Service.BaseService.Base;
 
-    public static void editEmployee(){
-        System.out.println("Sửa nhân viên");
-    }
+public class EmployeeService extends Base<Employee> implements IEmployeeService {
 
-    public static void deleteEmployee(){
-        System.out.println("Xóa nhân viên");
+    public EmployeeService(Class<Employee> employeeClass) {
+        super(employeeClass);
     }
 }

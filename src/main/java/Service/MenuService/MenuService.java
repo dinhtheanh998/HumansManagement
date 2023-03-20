@@ -1,7 +1,10 @@
 package Service.MenuService;
+import Model.Department;
+import Model.Employee;
 import Service.EmployeeService.EmployeeService;
 import Service.DepartmentService.DepartmentService;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class MenuService {
@@ -16,7 +19,8 @@ public class MenuService {
         switch (choice){
             case 1:
                 int choiceEmp = menuEmployee();
-                employeeMenuChoose(choiceEmp);
+                EmployeeService employeeService = new EmployeeService(Employee.class);
+                employeeMenuChoose(choiceEmp,employeeService);
                 break;
             case 2:
                 int choiceDep =  menuDepartment();
@@ -47,27 +51,28 @@ public class MenuService {
 
     }
 
-    public static void employeeMenuChoose(int choice){
+    public static void employeeMenuChoose(int choice, EmployeeService employeeService){
         switch (choice){
             case 1:
-                EmployeeService.addEmployee();
+                employeeService.add();
                 System.out.println("Bạn có muốn tiếp tục không? (Y/N)");
                 Scanner sc = new Scanner(System.in);
                 String choiceContinue = sc.nextLine();
                 if(choiceContinue.equals("Y")){
-                    employeeMenuChoose(choice);
+                    employeeMenuChoose(choice, employeeService);
                 }else {
                     menuEmployee();
                 }
                 break;
             case 2:
-                EmployeeService.editEmployee();
+//                EmployeeService.editEmployee();
                 break;
             case 3:
-                EmployeeService.deleteEmployee();
+//                EmployeeService.deleteEmployee();
                 break;
             case 4:
-//                EmployeeService.showEmployee();
+                List<Employee> lstEmp = employeeService.getAll();
+                lstEmp.forEach(System.out::println);
                 break;
             case 5:
                 System.out.println("Quay lại");
@@ -91,15 +96,17 @@ public class MenuService {
         return sc.nextInt();
     }
     public static void  departmentMenuChoose(int choiceDep){
+        DepartmentService departmentService = new DepartmentService(Department.class);
         switch (choiceDep) {
             case 1:
-                DepartmentService.addDepartment();
+                List<Department> lstDepartment =  departmentService.getAll();
+                lstDepartment.forEach(System.out::println);
                 break;
             case 2:
-                DepartmentService.editDepartment();
+//                departmentService.editDepartment();
                 break;
             case 3:
-                DepartmentService.deleteDepartment();
+//                departmentService.deleteDepartment();
                 break;
             case 4:
         }

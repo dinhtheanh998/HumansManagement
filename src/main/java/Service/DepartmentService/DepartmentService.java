@@ -1,16 +1,11 @@
 package Service.DepartmentService;
 
-public class DepartmentService {
-public static void addDepartment(){
-        System.out.println("Thêm phòng ban");
-    }
+import Model.Department;
+import Service.BaseService.Base;
 
-    public static void editDepartment(){
-        System.out.println("Sửa phòng ban");
-    }
+public class DepartmentService extends Base<Department> implements IDepartmentService {
 
-    public static void deleteDepartment(){
-        System.out.println("Xóa phòng ban");
+    public DepartmentService(Class<Department> departmentClass) {
+        super(departmentClass);
     }
-
 }

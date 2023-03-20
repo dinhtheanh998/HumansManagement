@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MyConnection {
-    private static  final String URL = "jdbc:mysql://localhost:3306/misa.web09.gpbl.dtanh";
+    private static  final String URL = "jdbc:mysql://localhost:3306/human_management";
 
     private static final String USER_DB = "root";
 
