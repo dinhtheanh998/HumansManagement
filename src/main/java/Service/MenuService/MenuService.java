@@ -6,6 +6,7 @@ import Service.DepartmentService.DepartmentService;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class MenuService {
     public static void showMenu(){
@@ -20,7 +21,13 @@ public class MenuService {
             case 1:
                 int choiceEmp = menuEmployee();
                 EmployeeService employeeService = new EmployeeService(Employee.class);
-                employeeMenuChoose(choiceEmp,employeeService);
+                try {
+                    employeeMenuChoose(choiceEmp,employeeService);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
                 break;
             case 2:
                 int choiceDep =  menuDepartment();
@@ -51,10 +58,10 @@ public class MenuService {
 
     }
 
-    public static void employeeMenuChoose(int choice, EmployeeService employeeService){
+    public static void employeeMenuChoose(int choice, EmployeeService employeeService) throws InstantiationException, IllegalAccessException {
         switch (choice){
             case 1:
-                employeeService.add();
+                employeeService.add(Department.class);
                 System.out.println("Bạn có muốn tiếp tục không? (Y/N)");
                 Scanner sc = new Scanner(System.in);
                 String choiceContinue = sc.nextLine();
@@ -95,7 +102,7 @@ public class MenuService {
         Scanner sc = new Scanner(System.in);
         return sc.nextInt();
     }
-    public static void  departmentMenuChoose(int choiceDep){
+    public static void  departmentMenuChoose(int choiceDep) {
         DepartmentService departmentService = new DepartmentService(Department.class);
         switch (choiceDep) {
             case 1:
@@ -103,6 +110,13 @@ public class MenuService {
                 lstDepartment.forEach(System.out::println);
                 break;
             case 2:
+                Department department = new Department(UUID.randomUUID(),"PB01","Phòng ban 1","Phòng ban 1");
+                try{
+                    departmentService.add(null);
+                }catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
+//                departmentService.add();
 //                departmentService.editDepartment();
                 break;
             case 3:

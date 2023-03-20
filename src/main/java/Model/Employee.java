@@ -1,6 +1,8 @@
 package Model;
 
 import Service.BaseService.Base;
+import jdk.jfr.Description;
+import jdk.jfr.Label;
 import jdk.jfr.Name;
 
 import java.math.BigDecimal;
@@ -11,33 +13,47 @@ public class Employee  {
     @Name("ID")
     private UUID id;
     @Name("Code")
+    @Label("Mã nhân viên")
     private String code;
     @Name("FullName")
+    @Label("Họ và tên")
+    @Description("Department")
+
     private String name;
 
+
     @Name("Gender")
+    @Label("Giới tính")
     private int gender;
     @Name("Email")
+    @Label("Email")
     private String email;
     @Name("Salary")
+    @Label("Lương")
     private BigDecimal salary;
     @Name("DateOfBirth")
+    @Label("Ngày sinh")
     private Date dateOfBirth;
     @Name("Address")
+    @Label("Địa chỉ")
     private String address;
 
     @Name("IdentityNumber")
+    @Label("Số CMND")
     private String identityNumber;
 
     @Name("DepartmentID")
+    @Label("Phòng ban")
     private UUID departmentID;
 
     private String departmentName;
 
     @Name("Phone")
+    @Label("Số điện thoại")
     private String phone;
 
     @Name("Is_MngDepartment")
+    @Label("Quản lý phòng ban")
     private Integer isManager;
 
 

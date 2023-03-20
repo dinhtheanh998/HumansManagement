@@ -22,7 +22,8 @@ public class Main {
         boolean isLogin = false;
         int count = 0;
         while (!isLogin){
-            System.out.println("Sai thông tin đăng nhập, vui lòng nhập lại!");
+            if(count > 0)
+                System.out.println("Sai thông tin đăng nhập, vui lòng nhập lại!");
             isLogin = Login();
             count++;
             if(count == 3){

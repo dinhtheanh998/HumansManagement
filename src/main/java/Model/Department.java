@@ -1,6 +1,8 @@
 package Model;
 
+import Common.Anonation.CustomAno;
 import jdk.jfr.Name;
+import jdk.jfr.Label;
 
 import java.util.UUID;
 
@@ -9,12 +11,16 @@ public class Department {
     private UUID id;
 
     @Name("code")
+    @Label("Mã phòng ban")
+    @CustomAno(name = "code", length = 10)
     private String code;
 
     @Name("name")
+    @Label("Tên phòng ban")
     private String name;
 
     @Name("discription")
+    @Label("Mô tả")
     private String discription;
 
     public Department() {

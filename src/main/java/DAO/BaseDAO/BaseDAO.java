@@ -18,6 +18,43 @@ public class BaseDAO<T> implements IBaseDAO<T> {
     }
     @Override
     public boolean add(T t) {
+        try {
+            Connection connection = MyConnection.getMyConnection();
+            String sql = String.format("INSERT INTO %s (", tClass.getSimpleName());
+            // INsert into Department (id, code, name, discription) values (?,?,?,?)
+
+            String value = "VALUES (";
+            for (Field field : tClass.getDeclaredFields()){
+                if(field.getAnnotation(Name.class) == null) continue;
+                String nameField = field.getAnnotation(Name.class).value();
+                sql += nameField + ",";
+                value += "?,";
+            }
+            sql = sql.substring(0, sql.length() - 1) + ")";
+            value = value.substring(0, value.length() - 1) + ")";
+            sql += value;
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            int index = 1;
+            for (Field field : tClass.getDeclaredFields()){
+                if(field.getAnnotation(Name.class) == null) continue;
+                // cấp quyền truy cập
+                field.setAccessible(true);
+
+                if(field.getType() == UUID.class){
+                    preparedStatement.setString(index, field.get(t).toString());
+                }else {
+                    preparedStatement.setObject(index, field.get(t));
+                }
+                index++;
+            }
+            int result = preparedStatement.executeUpdate();
+            // close connection
+            connection.close();
+            return result > 0;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
         return false;
     }
 
@@ -62,8 +99,6 @@ public class BaseDAO<T> implements IBaseDAO<T> {
             // close connection
             connection.close();
             return list;
-
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
