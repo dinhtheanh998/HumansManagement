@@ -9,6 +9,8 @@ public interface IBaseDAO<T> {
     public boolean update(T t);
     public boolean delete(T t);
     public T get(UUID id);
+
+    public T getByCode(String code);
     public List<T> getAll();
 
 }

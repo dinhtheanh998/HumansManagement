@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public class Department {
     @Name("id")
+    @CustomAno(name = "id", length = 10)
     private UUID id;
 
     @Name("code")
@@ -17,10 +18,12 @@ public class Department {
 
     @Name("name")
     @Label("Tên phòng ban")
+    @CustomAno(name = "name", length = 20)
     private String name;
 
     @Name("discription")
     @Label("Mô tả")
+    @CustomAno(name = "discription", length = 50)
     private String discription;
 
     public Department() {

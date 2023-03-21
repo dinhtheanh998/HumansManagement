@@ -74,6 +74,36 @@ public class BaseDAO<T> implements IBaseDAO<T> {
     }
 
     @Override
+    public T getByCode(String code) {
+        try{
+            Connection connection = MyConnection.getMyConnection();
+            String sql = String.format("SELECT * FROM %s WHERE code = ?", tClass.getSimpleName());
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, code);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            T t = tClass.newInstance();
+            while (resultSet.next()){
+                for(Field field: tClass.getDeclaredFields()){
+                    if(field.getAnnotation(Name.class) == null) continue;
+                    String nameField = field.getAnnotation(Name.class).value();
+                    field.setAccessible(true);
+                    if(field.getType() == UUID.class){
+                        UUID id = UUID.fromString(resultSet.getString(nameField));
+                        field.set(t, id);
+                    }else {
+                        field.set(t, resultSet.getObject(nameField));
+                    }
+                }
+            }
+            return t;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
     public List<T> getAll() {
         try {
             Connection connection = MyConnection.getMyConnection();

@@ -72,7 +72,10 @@ public class MenuService {
                 }
                 break;
             case 2:
-//                EmployeeService.editEmployee();
+                System.out.println("Nhập mã nhân viên cần sửa: ");
+                Scanner sc1 = new Scanner(System.in);
+                String id = sc1.nextLine();
+                employeeService.edit(id);
                 break;
             case 3:
 //                EmployeeService.deleteEmployee();

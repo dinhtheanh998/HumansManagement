@@ -1,6 +1,10 @@
 package Model;
 
+import Common.Anonation.CustomAno;
+import Common.Anonation.Validate;
+import Common.Anonation.Validates;
 import Service.BaseService.Base;
+import jdk.jfr.ContentType;
 import jdk.jfr.Description;
 import jdk.jfr.Label;
 import jdk.jfr.Name;
@@ -17,19 +21,22 @@ public class Employee  {
     private String code;
     @Name("FullName")
     @Label("Họ và tên")
-    @Description("Department")
-
+    @Validates({
+            @Validate(name = "required", value = ""),
+    })
     private String name;
 
 
     @Name("Gender")
     @Label("Giới tính")
+    @CustomAno(name = "Gender", length = 1, type = Integer.class)
     private int gender;
     @Name("Email")
     @Label("Email")
     private String email;
     @Name("Salary")
     @Label("Lương")
+
     private BigDecimal salary;
     @Name("DateOfBirth")
     @Label("Ngày sinh")
@@ -44,6 +51,7 @@ public class Employee  {
 
     @Name("DepartmentID")
     @Label("Phòng ban")
+    @Description("Department")
     private UUID departmentID;
 
     private String departmentName;
@@ -54,6 +62,7 @@ public class Employee  {
 
     @Name("Is_MngDepartment")
     @Label("Quản lý phòng ban")
+    @CustomAno(name = "Unique" , length = 1, type = Integer.class)
     private Integer isManager;
 
 
