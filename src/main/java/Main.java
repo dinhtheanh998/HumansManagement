@@ -3,6 +3,7 @@ import Service.EmployeeService.EmployeeService;
 import Service.MenuService.MenuService;
 import jdk.jfr.Name;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -21,6 +22,8 @@ public class Main {
 
         boolean isLogin = false;
         int count = 0;
+//        BigDecimal hehe = EmployeeService.getTax(new BigDecimal(91000000));
+//        System.out.println(hehe);
         while (!isLogin){
             if(count > 0)
                 System.out.println("Sai thông tin đăng nhập, vui lòng nhập lại!");
@@ -56,4 +59,7 @@ public class Main {
         }
         return false;
     }
+
+    // calc tax for employee
+
 }

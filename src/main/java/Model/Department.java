@@ -6,6 +6,7 @@ import jdk.jfr.Label;
 
 import java.util.UUID;
 
+@Name("Phòng ban")
 public class Department {
     @Name("id")
     @CustomAno(name = "id", length = 10)

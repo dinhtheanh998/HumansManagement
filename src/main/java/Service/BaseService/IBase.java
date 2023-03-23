@@ -8,9 +8,9 @@ public interface IBase<T> {
 
     List<T> getAll();
 
-    boolean add(Class<?> e) throws InstantiationException, IllegalAccessException, ParseException;
+    boolean add(Class<?> e,boolean isUpdate) throws InstantiationException, IllegalAccessException, ParseException;
 
-    boolean edit(String code);
+    boolean edit(Class<?> e,String code);
     boolean delete();
 
 }

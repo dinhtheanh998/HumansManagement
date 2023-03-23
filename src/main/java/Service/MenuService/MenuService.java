@@ -1,4 +1,5 @@
 package Service.MenuService;
+
 import Model.Department;
 import Model.Employee;
 import Service.EmployeeService.EmployeeService;
@@ -8,21 +9,31 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+import static java.math.BigDecimal.ROUND_HALF_EVEN;
+
 public class MenuService {
-    public static void showMenu(){
+
+    /**
+     * Menu chính sau khi đăng nhập
+     */
+    public static void showMenu() {
         System.out.println("--------------------");
         System.out.println("1.Quản lý nhân viên");
         System.out.println("2.Quản lý phòng ban");
         System.out.println("3.Đăng xuất");
         System.out.println("--------------------");
     }
-    public static void choose(int choice){
-        switch (choice){
+
+    /**
+     * Lựa chọn menu chính
+     */
+    public static void choose(int choice) {
+        switch (choice) {
             case 1:
                 int choiceEmp = menuEmployee();
                 EmployeeService employeeService = new EmployeeService(Employee.class);
                 try {
-                    employeeMenuChoose(choiceEmp,employeeService);
+                    employeeMenuChoose(choiceEmp, employeeService);
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
@@ -30,7 +41,7 @@ public class MenuService {
                 }
                 break;
             case 2:
-                int choiceDep =  menuDepartment();
+                int choiceDep = menuDepartment();
                 departmentMenuChoose(choiceDep);
                 break;
             case 3:
@@ -41,33 +52,42 @@ public class MenuService {
                 break;
         }
     }
+
     /**
      * Menu lựa chọn quan ly nhân viên
+     *
      * @return 1 lựa chọn của người dùng
-     * */
-    public static int menuEmployee(){
+     */
+    public static int menuEmployee() {
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------");
         System.out.println("1.Thêm nhân viên");
         System.out.println("2.Sửa nhân viên");
         System.out.println("3.Xóa nhân viên");
         System.out.println("4.Xem danh sách nhân viên");
+        System.out.println("6.Xóa nhiều nhân viên theo mã");
         System.out.println("5.Quay lại");
         System.out.println("--------------------");
         return sc.nextInt();
 
     }
 
+    /**
+     * menu lựa chọn quản lý nhân viên
+     *
+     * @param choice          lựa chọn của người dùng
+     * @param employeeService đối tượng EmployeeService     *
+     */
     public static void employeeMenuChoose(int choice, EmployeeService employeeService) throws InstantiationException, IllegalAccessException {
-        switch (choice){
+        switch (choice) {
             case 1:
-                employeeService.add(Department.class);
+                employeeService.add(Department.class, false);
                 System.out.println("Bạn có muốn tiếp tục không? (Y/N)");
                 Scanner sc = new Scanner(System.in);
                 String choiceContinue = sc.nextLine();
-                if(choiceContinue.equals("Y")){
+                if (choiceContinue.equals("Y")) {
                     employeeMenuChoose(choice, employeeService);
-                }else {
+                } else {
                     menuEmployee();
                 }
                 break;
@@ -75,17 +95,31 @@ public class MenuService {
                 System.out.println("Nhập mã nhân viên cần sửa: ");
                 Scanner sc1 = new Scanner(System.in);
                 String id = sc1.nextLine();
-                employeeService.edit(id);
+                if(employeeService.edit(Department.class,id)){
+                    System.out.println("Sửa thành công");
+                    menuEmployee();
+                }else{
+                    System.out.println("Sửa thất bại");
+                    choose(1);
+                };
                 break;
             case 3:
 //                EmployeeService.deleteEmployee();
                 break;
             case 4:
                 List<Employee> lstEmp = employeeService.getAll();
-                lstEmp.forEach(System.out::println);
+                System.out.printf("%-5s %-10s %-20s %-10s %-10s %-10s %-10s " ,"STT", "Mã NV", "Tên NV", "Ngày sinh","Giới tính","Lương", "Thuế");
+               for(int i = 0; i < lstEmp.size(); i++) {
+                   System.out.println();
+                   System.out.printf("%-5s %-10s %-20s %-10s %-10s %-10s %-10s",
+                           i+1, lstEmp.get(i).getCode(), lstEmp.get(i).getName(), lstEmp.get(i).getDateOfBirth(),lstEmp.get(i).getGender()  == 1 ? "Nam": "Nữ", lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(), EmployeeService.getTax(lstEmp.get(i).getSalary()).toString());
+               }
                 break;
             case 5:
                 System.out.println("Quay lại");
+                break;
+            case 6:
+                employeeService.DeleteBatch();
                 break;
             default:
                 System.out.println("Vui lòng nhập lại!");
@@ -93,8 +127,12 @@ public class MenuService {
         }
     }
 
-
-    public static int menuDepartment(){
+    /**
+     * Menu lựa chọn quản lý phòng ban
+     *
+     * @return 1 lựa chọn của người dùng
+     */
+    public static int menuDepartment() {
         System.out.println("--------------------");
         System.out.println("1.Thêm phòng ban");
         System.out.println("2.Sửa phòng ban");
@@ -105,27 +143,37 @@ public class MenuService {
         Scanner sc = new Scanner(System.in);
         return sc.nextInt();
     }
-    public static void  departmentMenuChoose(int choiceDep) {
+
+    /**
+     * menu lựa chọn quản lý phòng ban
+     *
+     * @param choiceDep lựa chọn của người dùng     *
+     */
+
+    public static void departmentMenuChoose(int choiceDep) {
         DepartmentService departmentService = new DepartmentService(Department.class);
         switch (choiceDep) {
             case 1:
-                List<Department> lstDepartment =  departmentService.getAll();
-                lstDepartment.forEach(System.out::println);
-                break;
-            case 2:
-                Department department = new Department(UUID.randomUUID(),"PB01","Phòng ban 1","Phòng ban 1");
-                try{
-                    departmentService.add(null);
-                }catch (Exception e){
+                Department department = new Department(UUID.randomUUID(), "PB01", "Phòng ban 1", "Phòng ban 1");
+                try {
+                    departmentService.add(null, false);
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
-//                departmentService.add();
-//                departmentService.editDepartment();
+                break;
+            case 2:
+                System.out.println("Nhập mã phòng ban cần sửa: ");
+                Scanner sc1 = new Scanner(System.in);
+                String id = sc1.nextLine();
+                departmentService.edit(null,id);
                 break;
             case 3:
-//                departmentService.deleteDepartment();
+                departmentService.delete();
                 break;
             case 4:
+                List<Department> lstDep = departmentService.getAll();
+                lstDep.forEach(System.out::println);
+                break;
         }
     }
 }

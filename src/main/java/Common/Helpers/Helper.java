@@ -1,28 +1,97 @@
 package Common.Helpers;
 
 import Common.Anonation.Validates;
+import DAO.BaseDAO.BaseDAO;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 public class Helper {
-    public static boolean validateInput (Validates validateName, String input, String fieldName){
+    public static boolean validateInput(Validates validateName, String input, String fieldName, Class<?> tClass, boolean isUpdate) {
         if (validateName.value().length == 0) return true;
         for (int i = 0; i < validateName.value().length; i++) {
-            if (validateName.value()[i].name().equals("required") && input.isEmpty()) {
+            String nameValue = validateName.value()[i].name();
+            String value = validateName.value()[i].value();
+            if (nameValue.equals("required") && input.isEmpty() && !isUpdate) {
                 System.out.println(fieldName + " không được để trống");
                 return false;
             }
-            if (validateName.value()[i].name().equals("min") && input.length() < Integer.parseInt(validateName.value()[i].value())) {
-                System.out.println(fieldName + " phải lớn hơn " + validateName.value()[i].value());
-                return false;
+            if (nameValue.equalsIgnoreCase("onlyOne")) {
+                // DAO get all
+                tClass.getSimpleName();
+                if (!isUpdate) {
+                    BaseDAO baseDAO = new BaseDAO(tClass);
+                    Object rs = baseDAO.getByCode(input);
+                    if (rs != null) {
+                        System.out.println(fieldName + " đã tồn tại");
+                        return false;
+                    }
+                }
+                return true;
             }
-            if (validateName.value()[i].name().equals("max") && input.length() > Integer.parseInt(validateName.value()[i].value())) {
-                System.out.println(fieldName + " phải nhỏ hơn " + validateName.value()[i].value());
-                return false;
+
+            if (nameValue.equalsIgnoreCase("type") && !isUpdate) {
+                String valueName = value;
+                switch (valueName) {
+                    case "int":
+                        try {
+                            Integer.parseInt(input);
+                        } catch (Exception e) {
+                            System.out.println(fieldName + " phải là số nguyên");
+                            return false;
+                        }
+                        break;
+                    case "double":
+                        try {
+                            Double.parseDouble(input);
+                        } catch (Exception e) {
+                            System.out.println(fieldName + " phải là số thực");
+                            return false;
+                        }
+                        break;
+                    case "float":
+                        try {
+                            Float.parseFloat(input);
+                        } catch (Exception e) {
+                            System.out.println(fieldName + " phải là số thực");
+                            return false;
+                        }
+                        break;
+                    case "long":
+                        try {
+                            Long.parseLong(input);
+                        } catch (Exception e) {
+                            System.out.println(fieldName + " phải là số nguyên");
+                            return false;
+                        }
+                        break;
+                    case "string":
+                        break;
+                    default:
+                        break;
+                }
             }
-            if(validateName.value()[i].name().equals("number")){
-                return false;
+            if(!input.isEmpty()){
+                if (nameValue.equals("min") && Integer.parseInt(input) < Integer.parseInt(value)) {
+                    System.out.println(fieldName + " phải là 0: Nữ hoặc 1: Nam");
+                    return false;
+                }
+                if (nameValue.equals("max") && Integer.parseInt(input) > Integer.parseInt(value)) {
+                    System.out.println(fieldName + " phải là 0: Nữ hoặc 1: Nam");
+                    return false;
+                }
+
+                if (nameValue.equals("minL") && input.length() < Integer.parseInt(value)) {
+                    System.out.println(fieldName + " phải lớn hơn " + value);
+                    return false;
+                }
+                if (nameValue.equals("maxL") && input.length() > Integer.parseInt(value)) {
+                    System.out.println(fieldName + " phải nhỏ hơn " + value);
+                    return false;
+                }
+                if (nameValue.equals("number")) {
+                    return false;
+                }
             }
         }
         return true;

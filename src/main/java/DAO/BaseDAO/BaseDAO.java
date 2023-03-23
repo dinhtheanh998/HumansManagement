@@ -17,7 +17,7 @@ public class BaseDAO<T> implements IBaseDAO<T> {
         this.tClass = tClass;
     }
     @Override
-    public boolean add(T t) {
+    public boolean add(T t, boolean isUpdate) {
         try {
             Connection connection = MyConnection.getMyConnection();
             String sql = String.format("INSERT INTO %s (", tClass.getSimpleName());
@@ -41,9 +41,9 @@ public class BaseDAO<T> implements IBaseDAO<T> {
                 field.setAccessible(true);
 
                 if(field.getType() == UUID.class){
-                    preparedStatement.setString(index, field.get(t).toString());
+                    preparedStatement.setString(index, field.get(t) != null ? field.get(t).toString() : null);
                 }else {
-                    preparedStatement.setObject(index, field.get(t));
+                    preparedStatement.setObject(index, field.get(t) != null ? field.get(t) : null);
                 }
                 index++;
             }
@@ -60,12 +60,63 @@ public class BaseDAO<T> implements IBaseDAO<T> {
 
     @Override
     public boolean update(T t) {
+        try {
+            Connection connection = MyConnection.getMyConnection();
+            String sql = String.format("UPDATE %s SET ", tClass.getSimpleName());
+            // update Department set code = ?, name = ?, discription = ? where id = ?
+            for (Field field : tClass.getDeclaredFields()){
+                if(field.getAnnotation(Name.class) == null) continue;
+                String nameField = field.getAnnotation(Name.class).value();
+                sql += nameField + " = ?,";
+            }
+            sql = sql.substring(0, sql.length() - 1);
+            sql += " WHERE id = ";
+
+            // get id of t
+            for (Field field : tClass.getDeclaredFields()){
+                field.setAccessible(true);
+                if(field.getAnnotation(Name.class) == null) continue;
+                if(field.getName().equalsIgnoreCase("id")){
+                    sql += "'"+ field.get(t).toString()+"'";
+                }
+            }
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            int index = 1;
+            for (Field field : tClass.getDeclaredFields()){
+                if(field.getAnnotation(Name.class) == null) continue;
+                // cấp quyền truy cập
+                field.setAccessible(true);
+
+                if(field.getType() == UUID.class){
+                    preparedStatement.setString(index, field.get(t).toString());
+                }else {
+                    preparedStatement.setObject(index, field.get(t));
+                }
+                index++;
+            }
+//            System.out.println(preparedStatement);
+            int result = preparedStatement.executeUpdate();
+            return result > 0;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         return false;
     }
 
     @Override
-    public boolean delete(T t) {
-        return false;
+    public boolean delete(String code) {
+        try{
+            Connection connection = MyConnection.getMyConnection();
+            String sql = String.format("DELETE FROM %s WHERE code = ?", tClass.getSimpleName());
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, code);
+            int result = preparedStatement.executeUpdate();
+            connection.close();
+            return result > 0;
+        }catch(Exception SQLIntegrityConstraintViolationException){
+            throw new RuntimeException("Không thể xóa vì có dữ liệu liên quan");
+        }
     }
 
     @Override
@@ -81,8 +132,9 @@ public class BaseDAO<T> implements IBaseDAO<T> {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             T t = tClass.newInstance();
-            while (resultSet.next()){
+            if (resultSet.next()){
                 for(Field field: tClass.getDeclaredFields()){
                     if(field.getAnnotation(Name.class) == null) continue;
                     String nameField = field.getAnnotation(Name.class).value();
@@ -94,12 +146,13 @@ public class BaseDAO<T> implements IBaseDAO<T> {
                         field.set(t, resultSet.getObject(nameField));
                     }
                 }
+            }else {
+                return null;
             }
             return t;
         }
         catch (Exception e){
-            System.out.println(e.getMessage());
-            return null;
+            throw new RuntimeException(e.getMessage());
         }
     }
 

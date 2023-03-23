@@ -18,6 +18,10 @@ public class Employee  {
     private UUID id;
     @Name("Code")
     @Label("Mã nhân viên")
+    @Validates({
+            @Validate(name="required"),
+            @Validate(name="onlyOne")
+    })
     private String code;
     @Name("FullName")
     @Label("Họ và tên")
@@ -30,6 +34,11 @@ public class Employee  {
     @Name("Gender")
     @Label("Giới tính")
     @CustomAno(name = "Gender", length = 1, type = Integer.class)
+    @Validates({
+            @Validate(name="type", value = "int"),
+            @Validate(name="max", value = "1"),
+            @Validate(name="min", value = "0"),
+    })
     private int gender;
     @Name("Email")
     @Label("Email")
@@ -39,7 +48,7 @@ public class Employee  {
 
     private BigDecimal salary;
     @Name("DateOfBirth")
-    @Label("Ngày sinh")
+    @Label("Ngày sinh (yyyy-MM-dd)")
     private Date dateOfBirth;
     @Name("Address")
     @Label("Địa chỉ")
