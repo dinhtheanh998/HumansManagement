@@ -50,7 +50,18 @@ public class Base<T> implements IBase<T> {
             } else {
                 CustomAno myCustomAnn = field.getAnnotation(CustomAno.class);
                 Validates myValidates = field.getAnnotation(Validates.class);
-                System.out.println("Nhập: " + valueAnonaLabel.value());
+                if(customCheck(tmp)) {
+                    System.out.println("Nhập: " + valueAnonaLabel.value());
+                }else {
+                    if(myCustomAnn != null) {
+                        String unique = myCustomAnn.name();
+                        if(unique.equalsIgnoreCase("unique")) {
+                            continue;
+                        }
+                    }else {
+                        System.out.println("Nhập: " + valueAnonaLabel.value());
+                    }
+                }
                 field.setAccessible(true);
                 String nextLine = sc.nextLine();
                 if (myValidates != null) {
@@ -127,25 +138,25 @@ public class Base<T> implements IBase<T> {
         }
     }
 
-    private void printDataPClass(Class<?> pClass, List<?> list, int listSize) throws IllegalAccessException {
-        for (int i = 0; i < listSize; i++) {
-            for (Field field2 : pClass.getDeclaredFields()) {
-                int length = 1;
-                String name = "";
-                CustomAno personAnnotation = field2.getAnnotation(CustomAno.class);
-                if (personAnnotation != null) {
-                    field2.setAccessible(true);
-                    length = personAnnotation.length();
-                    name = personAnnotation.name();
-                    if (name.equals("id"))
-                        System.out.printf("%-" + length + "s", i + 1);
-                    else
-                        System.out.printf("%-" + length + "s", field2.get(list.get(i)));
-                }
-            }
-            System.out.println();
-        }
-    }
+//    private void printDataPClass(Class<?> pClass, List<?> list, int listSize) throws IllegalAccessException {
+//        for (int i = 0; i < listSize; i++) {
+//            for (Field field2 : pClass.getDeclaredFields()) {
+//                int length = 1;
+//                String name = "";
+//                CustomAno personAnnotation = field2.getAnnotation(CustomAno.class);
+//                if (personAnnotation != null) {
+//                    field2.setAccessible(true);
+//                    length = personAnnotation.length();
+//                    name = personAnnotation.name();
+//                    if (name.equals("id"))
+//                        System.out.printf("%-" + length + "s", i + 1);
+//                    else
+//                        System.out.printf("%-" + length + "s", field2.get(list.get(i)));
+//                }
+//            }
+//            System.out.println();
+//        }
+//    }
 
     private static UUID getUuid(String sc, List<?> list) {
         String str = sc;
@@ -227,6 +238,7 @@ public class Base<T> implements IBase<T> {
                             continue;
                         }
                     }
+
                     System.out.println(field.getAnnotation(Label.class).value());
 
                     if (field.getAnnotation(Description.class) != null) {
@@ -282,7 +294,7 @@ public class Base<T> implements IBase<T> {
         }
     }
 
-    public boolean customCheck() {
+    public boolean customCheck(T t) {
         return true;
     }
 }

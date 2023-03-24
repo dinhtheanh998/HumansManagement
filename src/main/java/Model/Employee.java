@@ -42,6 +42,9 @@ public class Employee  {
     private int gender;
     @Name("Email")
     @Label("Email")
+    @Validates({
+            @Validate(name="email"),
+    })
     private String email;
     @Name("Salary")
     @Label("Lương")
@@ -67,6 +70,9 @@ public class Employee  {
 
     @Name("Phone")
     @Label("Số điện thoại")
+    @Validates({
+            @Validate(name="phone"),
+    })
     private String phone;
 
     @Name("Is_MngDepartment")

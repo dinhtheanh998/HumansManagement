@@ -2,6 +2,10 @@ package Common.Helpers;
 
 import Common.Anonation.Validates;
 import DAO.BaseDAO.BaseDAO;
+import DAO.EmployeeDAO.EmployeeDAO;
+import DAO.EmployeeDAO.IEmployeeDAO;
+import Model.Employee;
+import Service.EmployeeService.EmployeeService;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -92,7 +96,54 @@ public class Helper {
                 if (nameValue.equals("number")) {
                     return false;
                 }
+                if(nameValue.equals("email")){
+                    if(!checkEmail(input)){
+                        System.out.println(fieldName + " không đúng định dạng");
+                        return false;
+                    }else {
+                        if(!isUpdate){
+                            EmployeeService empS = new EmployeeService();
+                            boolean rs = empS.getInfoByEmail(input);
+                            if (rs) {
+                                System.out.println(fieldName + " đã tồn tại");
+                                return false;
+                            }
+                            return true;
+                        }
+                    }
+                }
+                if(nameValue.equals("phone")){
+                    if(!checkPhone(input)){
+                        System.out.println(fieldName + " không đúng định dạng");
+                        return false;
+                    }else {
+                        if(!isUpdate){
+                            EmployeeService empS = new EmployeeService();
+                            boolean rs = empS.getInfoByPhone(input);
+                            if (rs) {
+                                System.out.println(fieldName + " đã tồn tại");
+                                return false;
+                            }
+                            return true;
+                        }
+                    }
+                }
             }
+        }
+        return true;
+    }
+
+
+    public static boolean checkPhone(String phone){
+        if(!phone.matches("^[0-9]{10,11}$")){
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkEmail (String email){
+        if(!email.matches("^[a-zA-Z0-9]+@[a-zA-Z0-9]+(\\.[a-zA-Z0-9]+)+$")){
+            return false;
         }
         return true;
     }

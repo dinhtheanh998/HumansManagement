@@ -6,5 +6,8 @@ import Model.Employee;
 import java.util.List;
 
 public interface IEmployeeDAO extends IBaseDAO<Employee> {
-    public boolean DeleteBatch(String[] employeeCodes);
+    boolean DeleteBatch(String[] employeeCodes);
+
+     Boolean getInfoByEmail(String email);
+     Boolean getInfoByPhone(String phone);
 }

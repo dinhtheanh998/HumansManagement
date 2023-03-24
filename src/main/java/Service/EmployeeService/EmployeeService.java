@@ -2,17 +2,27 @@ package Service.EmployeeService;
 
 import Common.Enums.MilestonesSalary;
 import DAO.EmployeeDAO.EmployeeDAO;
+import DAO.EmployeeDAO.IEmployeeDAO;
 import Model.Employee;
 import Service.BaseService.Base;
+import Service.DepartmentService.DepartmentService;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Scanner;
 
 public class EmployeeService extends Base<Employee> implements IEmployeeService {
 
-    public EmployeeService(Class<Employee> employeeClass) {
+    private IEmployeeDAO _empDAO;
+
+
+    public EmployeeService() {
+        super(Employee.class);
+        _empDAO = new EmployeeDAO(Employee.class);
+    }
+
+    public EmployeeService(Class<Employee> employeeClass, IEmployeeDAO empDAO) {
         super(employeeClass);
+        _empDAO = empDAO;
     }
 
 
@@ -22,6 +32,16 @@ public class EmployeeService extends Base<Employee> implements IEmployeeService 
         System.out.println("Nhập 1 mảng mã nhân viên cần xóa ( cách nhau bởi dấu space ): ");
         String[] listCode = sc.nextLine().split(" ");
         return new EmployeeDAO(Employee.class).DeleteBatch(listCode);
+    }
+
+    @Override
+    public boolean getInfoByEmail(String email) {
+        return _empDAO.getInfoByEmail(email);
+    }
+
+    @Override
+    public boolean getInfoByPhone(String phone) {
+        return _empDAO.getInfoByPhone(phone);
     }
 
     // tính thuế sau khi giảm trừ phụ thuộc
@@ -74,7 +94,14 @@ public class EmployeeService extends Base<Employee> implements IEmployeeService 
     }
 
     @Override
-    public boolean customCheck(){
-        return true;
+    public boolean customCheck(Employee e){
+        DepartmentService departmentService = new DepartmentService();
+        if(departmentService.checkDepartmentHasManager(e.getDepartmentID())){
+            return false;
+        }else {
+            return true;
+        }
     }
+
+
 }

@@ -31,7 +31,7 @@ public class MenuService {
         switch (choice) {
             case 1:
                 int choiceEmp = menuEmployee();
-                EmployeeService employeeService = new EmployeeService(Employee.class);
+                EmployeeService employeeService = new EmployeeService();
                 try {
                     employeeMenuChoose(choiceEmp, employeeService);
                 } catch (InstantiationException e) {

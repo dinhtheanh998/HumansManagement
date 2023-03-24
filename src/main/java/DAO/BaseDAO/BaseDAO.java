@@ -77,7 +77,7 @@ public class BaseDAO<T> implements IBaseDAO<T> {
                 field.setAccessible(true);
                 if(field.getAnnotation(Name.class) == null) continue;
                 if(field.getName().equalsIgnoreCase("id")){
-                    sql += "'"+ field.get(t).toString()+"'";
+                    sql += field.get(t).toString() != null ? "'"+field.get(t).toString()+"'" : null;
                 }
             }
 
@@ -87,11 +87,10 @@ public class BaseDAO<T> implements IBaseDAO<T> {
                 if(field.getAnnotation(Name.class) == null) continue;
                 // cấp quyền truy cập
                 field.setAccessible(true);
-
                 if(field.getType() == UUID.class){
-                    preparedStatement.setString(index, field.get(t).toString());
+                    preparedStatement.setString(index, field.get(t) != null ? field.get(t).toString() : null);
                 }else {
-                    preparedStatement.setObject(index, field.get(t));
+                    preparedStatement.setObject(index, field.get(t) != null ? field.get(t) : null);
                 }
                 index++;
             }
@@ -121,7 +120,37 @@ public class BaseDAO<T> implements IBaseDAO<T> {
 
     @Override
     public T get(UUID id) {
-        return null;
+        try{
+            Connection connection = MyConnection.getMyConnection();
+            String sql = String.format("SELECT * FROM %s WHERE id = ?", tClass.getSimpleName());
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, id.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            T t = tClass.newInstance();
+            if (resultSet.next()){
+                for(Field field: tClass.getDeclaredFields()){
+                    if(field.getAnnotation(Name.class) == null) continue;
+                    String nameField = field.getAnnotation(Name.class).value();
+                    field.setAccessible(true);
+                    if(field.getType() == UUID.class){
+                        if(resultSet.getString(nameField) == null) {
+                            field.set(t, null);
+                        }else {
+                            UUID id2 = UUID.fromString(resultSet.getString(nameField));
+                            field.set(t, id2);
+                        }
+                    }else {
+                        field.set(t, resultSet.getObject(nameField));
+                    }
+                }
+            }else {
+                return null;
+            }
+            return t;
+        }catch (Exception e){
+                return null;
+        }
     }
 
     @Override
@@ -140,8 +169,14 @@ public class BaseDAO<T> implements IBaseDAO<T> {
                     String nameField = field.getAnnotation(Name.class).value();
                     field.setAccessible(true);
                     if(field.getType() == UUID.class){
-                        UUID id = UUID.fromString(resultSet.getString(nameField));
-                        field.set(t, id);
+                        if(resultSet.getString(nameField) == null) {
+                            field.set(t, null);
+                        }else {
+                            UUID id = UUID.fromString(resultSet.getString(nameField));
+                            field.set(t, id);
+                        }
+//                        UUID id = UUID.fromString(resultSet.getString(nameField) != null ? resultSet.getString(nameField) : null);
+//                        field.set(t, id);
                     }else {
                         field.set(t, resultSet.getObject(nameField));
                     }
