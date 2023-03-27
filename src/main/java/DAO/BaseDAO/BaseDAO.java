@@ -175,8 +175,6 @@ public class BaseDAO<T> implements IBaseDAO<T> {
                             UUID id = UUID.fromString(resultSet.getString(nameField));
                             field.set(t, id);
                         }
-//                        UUID id = UUID.fromString(resultSet.getString(nameField) != null ? resultSet.getString(nameField) : null);
-//                        field.set(t, id);
                     }else {
                         field.set(t, resultSet.getObject(nameField));
                     }
@@ -206,7 +204,7 @@ public class BaseDAO<T> implements IBaseDAO<T> {
                     String nameField = field.getAnnotation(Name.class).value();
                     field.setAccessible(true);
                     if(field.getType() == UUID.class){
-                        UUID id = UUID.fromString(resultSet.getString(nameField));
+                        UUID id = resultSet.getString(nameField) != null ? UUID.fromString(resultSet.getString(nameField)) : null;
                         field.set(t, id);
                     }else {
                         field.set(t, resultSet.getObject(nameField));
@@ -220,6 +218,44 @@ public class BaseDAO<T> implements IBaseDAO<T> {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public boolean getByEmail(String email) {
+        try{
+            Connection connection = MyConnection.getMyConnection();
+            String sql = String.format("SELECT * FROM %s WHERE email = ?", tClass.getSimpleName());
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                return true;
+            }else {
+                return false;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean getByPhone(String phone) {
+        try{
+            Connection connection = MyConnection.getMyConnection();
+            String sql = String.format("SELECT * FROM %s WHERE phone = ?", tClass.getSimpleName());
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, phone);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                return true;
+            }else {
+                return false;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
         }
     }
 }

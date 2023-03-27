@@ -64,6 +64,9 @@ public class Base<T> implements IBase<T> {
                 }
                 field.setAccessible(true);
                 String nextLine = sc.nextLine();
+                if(nextLine.equalsIgnoreCase("exit")) {
+                    return false;
+                }
                 if (myValidates != null) {
                     boolean check = Helper.validateInput(myValidates, nextLine, valueAnonaLabel.value(), tClass, isUpdate);
                     while (!check) {
@@ -126,6 +129,9 @@ public class Base<T> implements IBase<T> {
             }
             System.out.println("Nhập: " + field.getAnnotation(Label.class).value());
             String indexDepart = sc.nextLine();
+            if(indexDepart.equalsIgnoreCase("exit")){
+                return;
+            }
             field.setAccessible(true);
             if (indexDepart.isEmpty()) {
                 field.set(tmp, null);
@@ -248,6 +254,9 @@ public class Base<T> implements IBase<T> {
                         System.out.println("Giá trị cũ: " + value);
                         System.out.print("Nhập giá trị mới: ");
                         nextLine = sc.nextLine();
+                        if(nextLine.equalsIgnoreCase("exit")){
+                            return false;
+                        }
                         // kiểm tra xem người dùng có nhập gì không
                         if (!nextLine.isEmpty()) {
                             // nếu có thì thay đổi giá trị của field

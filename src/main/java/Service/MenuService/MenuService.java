@@ -66,6 +66,8 @@ public class MenuService {
         System.out.println("3.Xóa nhân viên");
         System.out.println("4.Xem danh sách nhân viên");
         System.out.println("6.Xóa nhiều nhân viên theo mã");
+        System.out.println("7.Thay đổi phòng ban của nhân viên");
+        System.out.println("8. Tìm kiếm nhân viên");
         System.out.println("5.Quay lại");
         System.out.println("--------------------");
         return sc.nextInt();
@@ -88,38 +90,64 @@ public class MenuService {
                 if (choiceContinue.equals("Y")) {
                     employeeMenuChoose(choice, employeeService);
                 } else {
-                    menuEmployee();
+                    choose(1);
                 }
                 break;
             case 2:
                 System.out.println("Nhập mã nhân viên cần sửa: ");
                 Scanner sc1 = new Scanner(System.in);
                 String id = sc1.nextLine();
-                if(employeeService.edit(Department.class,id)){
+                if (employeeService.edit(Department.class, id)) {
                     System.out.println("Sửa thành công");
-                    menuEmployee();
-                }else{
+                    choose(1);
+                } else {
                     System.out.println("Sửa thất bại");
                     choose(1);
-                };
+                }
+                ;
                 break;
             case 3:
 //                EmployeeService.deleteEmployee();
                 break;
             case 4:
                 List<Employee> lstEmp = employeeService.getAll();
-                System.out.printf("%-5s %-10s %-20s %-10s %-10s %-10s %-10s " ,"STT", "Mã NV", "Tên NV", "Ngày sinh","Giới tính","Lương", "Thuế");
-               for(int i = 0; i < lstEmp.size(); i++) {
-                   System.out.println();
-                   System.out.printf("%-5s %-10s %-20s %-10s %-10s %-10s %-10s",
-                           i+1, lstEmp.get(i).getCode(), lstEmp.get(i).getName(), lstEmp.get(i).getDateOfBirth(),lstEmp.get(i).getGender()  == 1 ? "Nam": "Nữ", lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(), EmployeeService.getTax(lstEmp.get(i).getSalary()).toString());
-               }
+                System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s","STT", "Mã NV", "Tên NV", "Ngày sinh", "Giới tính","SDT","Lương", "Thuế");
+                if (lstEmp != null) {
+                    for (int i = 0; i < lstEmp.size(); i++) {
+                        System.out.println();
+                        System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s",
+                                i + 1, lstEmp.get(i).getCode(), lstEmp.get(i).getName(), lstEmp.get(i).getDateOfBirth(),
+                                lstEmp.get(i).getGender() == 1 ? "Nam" : "Nữ",lstEmp.get(i).getPhone(),
+                                lstEmp.get(i).getSalary() != null ? lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(): null,
+                                lstEmp.get(i).getSalary() != null ? EmployeeService.getTax(lstEmp.get(i).getSalary()).toString() : null);}
+                } else {
+                    System.out.println("Không có nhân viên nào");
+                }
                 break;
             case 5:
                 System.out.println("Quay lại");
                 break;
             case 6:
                 employeeService.DeleteBatch();
+                break;
+            case 7:
+                employeeService.changeDepartmentID();
+                break;
+            case 8:
+                List<Employee> lstEmpFilter = employeeService.filter();
+                System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s", "STT", "Mã NV", "Tên NV", "Ngày sinh", "Giới tính", "SDT","Lương", "Thuế");
+                if (lstEmpFilter != null) {
+                    for (int i = 0; i < lstEmpFilter.size(); i++) {
+                        System.out.println();
+                        System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s",
+                                i + 1, lstEmpFilter.get(i).getCode(), lstEmpFilter.get(i).getName(), lstEmpFilter.get(i).getDateOfBirth(), lstEmpFilter.get(i).getGender() == 1 ? "Nam" : "Nữ",lstEmpFilter.get(i).getPhone(),
+                                lstEmpFilter.get(i).getSalary() != null ? lstEmpFilter.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(): null,
+                                lstEmpFilter.get(i).getSalary() != null ? EmployeeService.getTax(lstEmpFilter.get(i).getSalary()).toString() : null);
+                    }
+                } else {
+
+                    System.out.println("\nKhông có nhân viên nào");
+                }
                 break;
             default:
                 System.out.println("Vui lòng nhập lại!");
@@ -165,7 +193,7 @@ public class MenuService {
                 System.out.println("Nhập mã phòng ban cần sửa: ");
                 Scanner sc1 = new Scanner(System.in);
                 String id = sc1.nextLine();
-                departmentService.edit(null,id);
+                departmentService.edit(null, id);
                 break;
             case 3:
                 departmentService.delete();

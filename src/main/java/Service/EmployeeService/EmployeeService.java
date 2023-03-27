@@ -3,18 +3,18 @@ package Service.EmployeeService;
 import Common.Enums.MilestonesSalary;
 import DAO.EmployeeDAO.EmployeeDAO;
 import DAO.EmployeeDAO.IEmployeeDAO;
+import Model.Department;
 import Model.Employee;
 import Service.BaseService.Base;
 import Service.DepartmentService.DepartmentService;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class EmployeeService extends Base<Employee> implements IEmployeeService {
-
     private IEmployeeDAO _empDAO;
-
-
     public EmployeeService() {
         super(Employee.class);
         _empDAO = new EmployeeDAO(Employee.class);
@@ -34,14 +34,42 @@ public class EmployeeService extends Base<Employee> implements IEmployeeService 
         return new EmployeeDAO(Employee.class).DeleteBatch(listCode);
     }
 
+//    @Override
+//    public boolean getInfoByEmail(String email) {
+//        return _empDAO.getInfoByEmail(email);
+//    }
+//
+//    @Override
+//    public boolean getInfoByPhone(String phone) {
+//        return _empDAO.getInfoByPhone(phone);
+//    }
+
     @Override
-    public boolean getInfoByEmail(String email) {
-        return _empDAO.getInfoByEmail(email);
+    public boolean changeDepartmentID() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Nhập mã nhân viên cần thay đổi phòng ban: ");
+        String code = sc.nextLine();
+        DepartmentService departmentService = new DepartmentService();
+        List<Department> lstDpm = departmentService.getAll();
+        System.out.printf("%-10s %-10s %-20s %-50s", "STT", "Mã phòng ban", "Tên phòng ban", "Mô tả");
+        for(int i = 0; i < lstDpm.size(); i++){
+            System.out.println();
+            System.out.printf("%-10s %-10s %-20s %-50s", i + 1, lstDpm.get(i).getCode(), lstDpm.get(i).getName(), lstDpm.get(i).getDiscription());
+        }
+
+        System.out.println("\nNhập mã phòng ban mới: ");
+        String newDepartmentID = sc.nextLine();
+        UUID newID = UUID.fromString(lstDpm.get(Integer.parseInt(newDepartmentID) - 1).getId().toString());
+        return _empDAO.changeDepartmentID(code, newID);
+//        return _empDAO.changeDepartmentID(code, newDepartmentID);
     }
 
     @Override
-    public boolean getInfoByPhone(String phone) {
-        return _empDAO.getInfoByPhone(phone);
+    public List<Employee> filter() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Nhập từ khóa cần tìm kiếm: ");
+        String keyword = sc.nextLine();
+        return _empDAO.filter(keyword);
     }
 
     // tính thuế sau khi giảm trừ phụ thuộc

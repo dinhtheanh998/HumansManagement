@@ -102,8 +102,8 @@ public class Helper {
                         return false;
                     }else {
                         if(!isUpdate){
-                            EmployeeService empS = new EmployeeService();
-                            boolean rs = empS.getInfoByEmail(input);
+                            BaseDAO baseDAO = new BaseDAO(tClass);
+                            boolean rs = baseDAO.getByEmail(input);
                             if (rs) {
                                 System.out.println(fieldName + " đã tồn tại");
                                 return false;
@@ -118,8 +118,8 @@ public class Helper {
                         return false;
                     }else {
                         if(!isUpdate){
-                            EmployeeService empS = new EmployeeService();
-                            boolean rs = empS.getInfoByPhone(input);
+                            BaseDAO baseDAO = new BaseDAO(tClass);
+                            boolean rs = baseDAO.getByPhone(input);
                             if (rs) {
                                 System.out.println(fieldName + " đã tồn tại");
                                 return false;
