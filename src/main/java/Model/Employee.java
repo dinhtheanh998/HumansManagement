@@ -189,7 +189,7 @@ public class Employee  {
         this.phone = phone;
     }
 
-    public int getIsManager() {
+    public Integer getIsManager() {
         return isManager;
     }
 

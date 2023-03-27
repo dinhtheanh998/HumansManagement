@@ -5,6 +5,7 @@ import Model.Employee;
 import Service.EmployeeService.EmployeeService;
 import Service.DepartmentService.DepartmentService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -12,7 +13,10 @@ import java.util.UUID;
 import static java.math.BigDecimal.ROUND_HALF_EVEN;
 
 public class MenuService {
-
+    private static EmployeeService employeeService = new EmployeeService();
+    private static DepartmentService departmentService = new DepartmentService();
+    private static List<Employee> lstEmp = employeeService.getAll();
+    private static List<Department> lstDpm = departmentService.getAll();
     /**
      * Menu chính sau khi đăng nhập
      */
@@ -101,25 +105,27 @@ public class MenuService {
                     System.out.println("Sửa thành công");
                     choose(1);
                 } else {
-                    System.out.println("Sửa thất bại");
+//                    System.out.println("Sửa thất bại");
                     choose(1);
                 }
                 ;
                 break;
             case 3:
+                employeeService.delete();
 //                EmployeeService.deleteEmployee();
                 break;
             case 4:
                 List<Employee> lstEmp = employeeService.getAll();
-                System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s","STT", "Mã NV", "Tên NV", "Ngày sinh", "Giới tính","SDT","Lương", "Thuế");
+//                System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s","STT", "Mã NV", "Tên NV", "Ngày sinh", "Giới tính","SDT","Lương", "Thuế");
                 if (lstEmp != null) {
-                    for (int i = 0; i < lstEmp.size(); i++) {
-                        System.out.println();
-                        System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s",
-                                i + 1, lstEmp.get(i).getCode(), lstEmp.get(i).getName(), lstEmp.get(i).getDateOfBirth(),
-                                lstEmp.get(i).getGender() == 1 ? "Nam" : "Nữ",lstEmp.get(i).getPhone(),
-                                lstEmp.get(i).getSalary() != null ? lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(): null,
-                                lstEmp.get(i).getSalary() != null ? EmployeeService.getTax(lstEmp.get(i).getSalary()).toString() : null);}
+//                    for (int i = 0; i < lstEmp.size(); i++) {
+//                        System.out.println();
+//                        System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s",
+//                                i + 1, lstEmp.get(i).getCode(), lstEmp.get(i).getName(), lstEmp.get(i).getDateOfBirth(),
+//                                lstEmp.get(i).getGender() == 1 ? "Nam" : "Nữ",lstEmp.get(i).getPhone(),
+//                                lstEmp.get(i).getSalary() != null ? lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(): null,
+//                                lstEmp.get(i).getSalary() != null ? EmployeeService.getTax(lstEmp.get(i).getSalary()).toString() : null);}
+                    printEmpoyee(lstEmp);
                 } else {
                     System.out.println("Không có nhân viên nào");
                 }
@@ -200,8 +206,75 @@ public class MenuService {
                 break;
             case 4:
                 List<Department> lstDep = departmentService.getAll();
-                lstDep.forEach(System.out::println);
+                printDepartment(lstDep);
                 break;
+        }
+    }
+
+    public static void printDepartment(List<Department> lstDep){
+        EmployeeService employeeService = new EmployeeService();
+        System.out.println("------------------------------------------Danh sách phòng ban----------------------------------------------------------");
+        System.out.printf("| %-5s | %-10s | %-20s | %-35s | %-20s | %-10s |", "STT", "Mã PB", "Tên PB", "Mô tả", "Nguời quản lý", "Mã quản lý");
+        System.out.print("\n-----------------------------------------------------------------------------------------------------------------------");
+        for(int i = 0; i < lstDep.size(); i++){
+            System.out.println();
+            System.out.printf("| %-5s | %-10s | %-20s | %-35s | %-20s | %-10s |", i + 1, lstDep.get(i).getCode(), lstDep.get(i).getName(), lstDep.get(i).getDiscription(), getNameManager(lstDep.get(i).getId()).get("name"),getNameManager(lstDep.get(i).getId()).get("code"));
+            System.out.print("\n--------------------------------------------------------------------------------------------------------------------");
+        }
+        System.out.println();
+    }
+
+    private static void printEmpoyee(List<Employee> lstEmp){
+        System.out.println("-------------------------------------------------Danh sách nhân viên-------------------------------------------------------------------");
+        System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s %-20s %-15s %-20s", "STT", "Mã NV", "Tên NV", "Ngày sinh", "Giới tính", "SDT","Lương", "Thuế", "Phòng ban", "Mã phòng ban","Chức vụ");
+        for (int i = 0; i < lstEmp.size(); i++) {
+            System.out.println();
+            System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s %-20s %-15s %-20s",
+                    i + 1, lstEmp.get(i).getCode(), lstEmp.get(i).getName(), lstEmp.get(i).getDateOfBirth(),
+                    lstEmp.get(i).getGender() == 1 ? "Nam" : "Nữ",lstEmp.get(i).getPhone(),
+                    lstEmp.get(i).getSalary() != null ? lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(): null,
+                    lstEmp.get(i).getSalary() != null ? EmployeeService.getTax(lstEmp.get(i).getSalary()).toString() : null,
+                    getDepName(lstEmp.get(i).getDepartmentID()).get("name"), getDepName(lstEmp.get(i).getDepartmentID()).get("code"),
+                    checkIsManager(lstEmp.get(i).getIsManager())
+                    );
+            System.out.print("\n-------------------------------------------------------------------------------------------------------------------------------------");
+        }
+        System.out.println();
+    }
+
+    public static HashMap getNameManager(UUID id){
+        HashMap<String, String> map = new HashMap<>();
+        for(int i = 0; i < lstEmp.size(); i++){
+            if(lstEmp.get(i).getDepartmentID() == null){
+                map.put("name", "Không có");
+                map.put("code", "Không có");
+                continue;
+            }
+            if(lstEmp.get(i).getDepartmentID().equals(id)){
+                map.put("name", lstEmp.get(i).getName());
+                map.put("code", lstEmp.get(i).getCode());
+                return map;
+            }
+        }
+        return map;
+    }
+
+    public static HashMap getDepName(UUID id){
+        HashMap<String, String> map = new HashMap<>();
+        for(int i = 0; i < lstDpm.size(); i++){
+            if(lstDpm.get(i).getId().equals(id)){
+                map.put("name", lstDpm.get(i).getName());
+                map.put("code", lstDpm.get(i).getCode());
+                return map;
+            }
+        }
+        return map;
+    }
+    public static String checkIsManager(Integer manager){
+        if(manager == null) {
+            return "Nhân viên";
+        }else {
+            return "Quản lý";
         }
     }
 }

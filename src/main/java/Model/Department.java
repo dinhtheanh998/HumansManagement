@@ -27,6 +27,9 @@ public class Department {
     @CustomAno(name = "discription", length = 50)
     private String discription;
 
+    private String managerName;
+    private String managerCode;
+
     public Department() {
     }
 

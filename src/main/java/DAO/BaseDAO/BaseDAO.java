@@ -98,9 +98,10 @@ public class BaseDAO<T> implements IBaseDAO<T> {
             int result = preparedStatement.executeUpdate();
             return result > 0;
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("Sửa thất bại");
+//            System.out.println(e.getMessage());
+            return false;
         }
-        return false;
     }
 
     @Override

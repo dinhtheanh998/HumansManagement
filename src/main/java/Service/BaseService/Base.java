@@ -221,6 +221,7 @@ public class Base<T> implements IBase<T> {
             // lấy ra thông tin bản ghi theo code
             T tmp = _baseDAO.getByCode(code);
             if (tmp == null) {
+                System.out.println("Không tìm thấy bản ghi");
                 return false;
             }
             // lấy ra các field của class
@@ -278,6 +279,7 @@ public class Base<T> implements IBase<T> {
             }
             return _baseDAO.update(tmp);
         } catch (Exception e) {
+            System.out.println("Lỗi: " + e.getMessage());
             return false;
         }
     }
@@ -293,12 +295,11 @@ public class Base<T> implements IBase<T> {
                 System.out.println("Xóa thành công");
                 return true;
             }
-            return false;
-//            else {
-////                throw new Exception("Xóa thất bại");
-//            }
+            else {
+                throw new RuntimeException("Xóa thất bại");
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Lỗi: " + e.getMessage());
             return false;
         }
     }
