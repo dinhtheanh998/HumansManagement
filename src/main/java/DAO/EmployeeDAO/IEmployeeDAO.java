@@ -10,6 +10,11 @@ public interface IEmployeeDAO extends IBaseDAO<Employee> {
     boolean DeleteBatch(String[] employeeCodes);
 
 
-     boolean changeDepartmentID(String code, UUID newDepartmentID);
-     List<Employee> filter(String keyword);
+    boolean changeDepartmentID(String code, UUID newDepartmentID);
+
+    List<Employee> filter(String keyword);
+
+    List<Employee> sotedBySalary();
+
+    List<Employee> getListEmpByDepartment(UUID departmentID);
 }

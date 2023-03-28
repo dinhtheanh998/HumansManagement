@@ -18,8 +18,11 @@ public class EmployeeDAO extends BaseDAO<Employee> implements IEmployeeDAO {
 
     @Override
     public boolean DeleteBatch(String[] employeeCodes) {
+        Connection connection = null;
         try {
-            Connection connection = MyConnection.getMyConnection();
+            connection = MyConnection.getMyConnection();
+            connection.getTransactionIsolation();
+            connection.setAutoCommit(false);
             String sql = "DELETE FROM Employee WHERE code IN (";
             int length = employeeCodes.length;
             for (int i = 0; i < length; i++) {
@@ -35,11 +38,29 @@ public class EmployeeDAO extends BaseDAO<Employee> implements IEmployeeDAO {
                 preparedStatement.setString(i + 1, employeeCodes[i]);
             }
             int result = preparedStatement.executeUpdate();
-            connection.close();
-            return result > 0;
+            if (result > 0) {
+                connection.commit();
+                connection.close();
+                System.out.println("Xóa thành công" + result + " nhân viên");
+                return true;
+            } else {
+                connection.rollback();
+                connection.close();
+
+                return false;
+            }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Xóa thất bại");
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    return false;
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                    return false;
+                }
+            }
             return false;
         }
     }
@@ -84,16 +105,16 @@ public class EmployeeDAO extends BaseDAO<Employee> implements IEmployeeDAO {
 
     @Override
     public boolean changeDepartmentID(String code, UUID newDepartmentID) {
-        try{
+        try {
             Connection connection = MyConnection.getMyConnection();
-            String sql = "UPDATE Employee SET departmentID = ? WHERE code = ?";
+            String sql = "UPDATE Employee SET departmentID = ?, Is_MngDepartment = null WHERE code = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, newDepartmentID.toString());
             preparedStatement.setString(2, code);
             int result = preparedStatement.executeUpdate();
             connection.close();
             return result > 0;
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return false;
@@ -101,7 +122,7 @@ public class EmployeeDAO extends BaseDAO<Employee> implements IEmployeeDAO {
 
     @Override
     public List<Employee> filter(String keyword) {
-        try{
+        try {
             Connection connection = MyConnection.getMyConnection();
             String sql = "SELECT * FROM Employee WHERE code LIKE ? OR fullName LIKE ? OR email LIKE ? OR phone LIKE ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -113,17 +134,52 @@ public class EmployeeDAO extends BaseDAO<Employee> implements IEmployeeDAO {
             List<Employee> employees = this.getList(resultSet);
             connection.close();
             return employees;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
         return null;
     }
 
+    @Override
+    public List<Employee> sotedBySalary() {
+        try {
+            Connection connection = MyConnection.getMyConnection();
+            String sql = "SELECT * FROM Employee ORDER BY salary DESC";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Employee> employees = this.getList(resultSet);
+            connection.close();
+            return employees;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public List<Employee> getListEmpByDepartment(UUID departmentID) {
+        try {
+            Connection connection = MyConnection.getMyConnection();
+            String sql = "SELECT * FROM Employee WHERE departmentID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, departmentID.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Employee> employees = this.getList(resultSet);
+            connection.close();
+            return employees;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return  null;
+        }
+    }
+
     private List<Employee> getList(ResultSet resultSet) {
-        try{
+        try {
             List<Employee> employees = new ArrayList<>();
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 Employee employee = new Employee();
                 employee.setCode(resultSet.getString("code"));
                 employee.setName(resultSet.getString("fullName"));
@@ -137,12 +193,13 @@ public class EmployeeDAO extends BaseDAO<Employee> implements IEmployeeDAO {
                 employees.add(employee);
             }
             return employees;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             return null;
         }
 
     }
+
 
 }

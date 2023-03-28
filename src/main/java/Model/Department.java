@@ -1,6 +1,8 @@
 package Model;
 
 import Common.Anonation.CustomAno;
+import Common.Anonation.Validate;
+import Common.Anonation.Validates;
 import jdk.jfr.Name;
 import jdk.jfr.Label;
 
@@ -15,6 +17,10 @@ public class Department {
     @Name("code")
     @Label("Mã phòng ban")
     @CustomAno(name = "code", length = 10)
+    @Validates({
+            @Validate(name="required", value = ""),
+            @Validate(name="onlyOne")
+    })
     private String code;
 
     @Name("name")

@@ -32,8 +32,8 @@ public class Employee  {
 
 
     @Name("Gender")
-    @Label("Giới tính")
-    @CustomAno(name = "Gender", length = 1, type = Integer.class)
+    @Label("Giới tính (0: Nữ, 1: Nam)")
+//    @CustomAno(name = "Gender", length = 1, type = Integer.class)
     @Validates({
             @Validate(name="type", value = "int"),
             @Validate(name="max", value = "1"),
@@ -52,6 +52,9 @@ public class Employee  {
     private BigDecimal salary;
     @Name("DateOfBirth")
     @Label("Ngày sinh (yyyy-MM-dd)")
+    @Validates({
+            @Validate(name="date"),
+    })
     private Date dateOfBirth;
     @Name("Address")
     @Label("Địa chỉ")

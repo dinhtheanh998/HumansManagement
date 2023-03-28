@@ -9,12 +9,15 @@ import Service.BaseService.Base;
 import Service.DepartmentService.DepartmentService;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.function.Function;
 
 public class EmployeeService extends Base<Employee> implements IEmployeeService {
     private IEmployeeDAO _empDAO;
+
     public EmployeeService() {
         super(Employee.class);
         _empDAO = new EmployeeDAO(Employee.class);
@@ -31,28 +34,33 @@ public class EmployeeService extends Base<Employee> implements IEmployeeService 
         Scanner sc = new Scanner(System.in);
         System.out.println("Nhập 1 mảng mã nhân viên cần xóa ( cách nhau bởi dấu space ): ");
         String[] listCode = sc.nextLine().split(" ");
-        return new EmployeeDAO(Employee.class).DeleteBatch(listCode);
+        System.out.println("Bạn có muốn xóa"+ listCode.length +" không? (Y/N)");
+        String choice = sc.nextLine();
+        if (choice.equalsIgnoreCase("n")) {
+            return false;
+        } else if (choice.equals("Y") || choice.equals("y")) {
+            return new EmployeeDAO(Employee.class).DeleteBatch(listCode);
+        } else {
+            return false;
+        }
     }
 
-//    @Override
-//    public boolean getInfoByEmail(String email) {
-//        return _empDAO.getInfoByEmail(email);
-//    }
-//
-//    @Override
-//    public boolean getInfoByPhone(String phone) {
-//        return _empDAO.getInfoByPhone(phone);
-//    }
 
     @Override
     public boolean changeDepartmentID() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Nhập mã nhân viên cần thay đổi phòng ban: ");
         String code = sc.nextLine();
+        Employee emp = _empDAO.getByCode(code);
+        if (emp == null) {
+            System.out.println("Không tìm thấy nhân viên này");
+            return false;
+        }
+        System.out.println("Tên: " + emp.getName() + " Mã: " + emp.getCode() + " Phòng ban: " + emp.getDepartmentID());
         DepartmentService departmentService = new DepartmentService();
         List<Department> lstDpm = departmentService.getAll();
         System.out.printf("%-10s %-10s %-20s %-50s", "STT", "Mã phòng ban", "Tên phòng ban", "Mô tả");
-        for(int i = 0; i < lstDpm.size(); i++){
+        for (int i = 0; i < lstDpm.size(); i++) {
             System.out.println();
             System.out.printf("%-10s %-10s %-20s %-50s", i + 1, lstDpm.get(i).getCode(), lstDpm.get(i).getName(), lstDpm.get(i).getDiscription());
         }
@@ -70,6 +78,24 @@ public class EmployeeService extends Base<Employee> implements IEmployeeService 
         System.out.println("Nhập từ khóa cần tìm kiếm: ");
         String keyword = sc.nextLine();
         return _empDAO.filter(keyword);
+    }
+
+    @Override
+    public List<Employee> sotedBySalary() {
+        return _empDAO.sotedBySalary();
+    }
+
+    @Override
+    public List<Employee> getListEmpByDepartment() {
+        Scanner sc = new Scanner(System.in);
+        DepartmentService departmentService = new DepartmentService();
+        List<Department> lstDpm = departmentService.getAll();
+        printDepartment(lstDpm);
+        System.out.println("Nhập mã phòng ban cần lấy danh sách nhân viên: ");
+        String Code = sc.nextLine();
+        Department department = lstDpm.stream().filter(d -> d.getCode().equalsIgnoreCase(Code)).findFirst().orElse(null);
+        Function<Department, UUID> getID = (Department d) -> d.getId();
+        return _empDAO.getListEmpByDepartment(getID.apply(department));
     }
 
     // tính thuế sau khi giảm trừ phụ thuộc
@@ -122,14 +148,25 @@ public class EmployeeService extends Base<Employee> implements IEmployeeService 
     }
 
     @Override
-    public boolean customCheck(Employee e){
+    public boolean customCheck(Employee e) {
         DepartmentService departmentService = new DepartmentService();
-        if(departmentService.checkDepartmentHasManager(e.getDepartmentID())){
+        if (departmentService.checkDepartmentHasManager(e.getDepartmentID())) {
             return false;
-        }else {
+        } else {
             return true;
         }
     }
 
+    public static void printDepartment(List<Department> lstDep){
+        System.out.println("------------------------------------------Danh sách phòng ban----------------------------------------------------------");
+        System.out.printf("| %-5s | %-10s | %-20s | %-35s", "STT", "Mã PB", "Tên PB", "Mô tả");
+        System.out.print("\n-----------------------------------------------------------------------------------------------------------------------");
+        for(int i = 0; i < lstDep.size(); i++){
+            System.out.println();
+            System.out.printf("| %-5s | %-10s | %-20s | %-35s", i + 1, lstDep.get(i).getCode(), lstDep.get(i).getName(), lstDep.get(i).getDiscription());
+            System.out.print("\n--------------------------------------------------------------------------------------------------------------------");
+        }
+        System.out.println();
+    }
 
 }

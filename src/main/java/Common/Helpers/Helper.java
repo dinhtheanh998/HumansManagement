@@ -84,7 +84,6 @@ public class Helper {
                     System.out.println(fieldName + " phải là 0: Nữ hoặc 1: Nam");
                     return false;
                 }
-
                 if (nameValue.equals("minL") && input.length() < Integer.parseInt(value)) {
                     System.out.println(fieldName + " phải lớn hơn " + value);
                     return false;
@@ -128,12 +127,25 @@ public class Helper {
                         }
                     }
                 }
+                if(nameValue.equals("date")){
+                    if(!checkDate(input)){
+                        System.out.println(fieldName + " không đúng định dạng");
+                        return false;
+                    }
+                }
             }
         }
         return true;
     }
 
 
+    // check date format(yyyy-MM-dd)
+    public static boolean checkDate(String date){
+        if(!date.matches("^\\d{4}\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])$")){
+            return false;
+        }
+        return true;
+    }
     public static boolean checkPhone(String phone){
         if(!phone.matches("^[0-9]{10,11}$")){
             return false;
@@ -143,6 +155,15 @@ public class Helper {
 
     public static boolean checkEmail (String email){
         if(!email.matches("^[a-zA-Z0-9]+@[a-zA-Z0-9]+(\\.[a-zA-Z0-9]+)+$")){
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isNumeric(String indexDepart) {
+        try {
+            Integer.parseInt(indexDepart);
+        } catch (Exception e) {
             return false;
         }
         return true;

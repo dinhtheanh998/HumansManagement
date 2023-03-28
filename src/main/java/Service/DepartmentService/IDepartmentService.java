@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface IDepartmentService extends IBase<Department> {
 
     boolean checkDepartmentHasManager(UUID id);
+
+    boolean changeDepartmentManager();
 }

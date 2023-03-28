@@ -2,13 +2,15 @@ package Service.MenuService;
 
 import Model.Department;
 import Model.Employee;
+import Service.DepartmentService.IDepartmentService;
 import Service.EmployeeService.EmployeeService;
 import Service.DepartmentService.DepartmentService;
+import com.sun.tools.javac.Main;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ROUND_HALF_EVEN;
 
@@ -24,7 +26,7 @@ public class MenuService {
         System.out.println("--------------------");
         System.out.println("1.Quản lý nhân viên");
         System.out.println("2.Quản lý phòng ban");
-        System.out.println("3.Đăng xuất");
+        System.out.println("3.Thoát");
         System.out.println("--------------------");
     }
 
@@ -49,7 +51,7 @@ public class MenuService {
                 departmentMenuChoose(choiceDep);
                 break;
             case 3:
-                System.out.println("Đăng xuất thành công!");
+                System.out.println("Thoát!");
                 break;
             default:
                 System.out.println("Vui lòng nhập lại!");
@@ -71,7 +73,9 @@ public class MenuService {
         System.out.println("4.Xem danh sách nhân viên");
         System.out.println("6.Xóa nhiều nhân viên theo mã");
         System.out.println("7.Thay đổi phòng ban của nhân viên");
-        System.out.println("8. Tìm kiếm nhân viên");
+        System.out.println("8.Tìm kiếm nhân viên");
+        System.out.println("9.Sắp xếp nhân viên theo lương");
+        System.out.println("10.Nhân viên theo phòng ban");
         System.out.println("5.Quay lại");
         System.out.println("--------------------");
         return sc.nextInt();
@@ -87,15 +91,20 @@ public class MenuService {
     public static void employeeMenuChoose(int choice, EmployeeService employeeService) throws InstantiationException, IllegalAccessException {
         switch (choice) {
             case 1:
-                employeeService.add(Department.class, false);
-                System.out.println("Bạn có muốn tiếp tục không? (Y/N)");
-                Scanner sc = new Scanner(System.in);
-                String choiceContinue = sc.nextLine();
-                if (choiceContinue.equals("Y")) {
-                    employeeMenuChoose(choice, employeeService);
-                } else {
-                    choose(1);
+                boolean checkAdd = employeeService.add(Department.class, false);
+                if(checkAdd){
+                    System.out.println("Thêm thành công");}
+                else {
+                    System.out.println("Thêm thất bại");
                 }
+//                System.out.println("Bạn có muốn tiếp tục không? (Y/N)");
+//                Scanner sc = new Scanner(System.in);
+//                String choiceContinue = sc.nextLine();
+//                if (choiceContinue.equals("Y")) {
+//                    employeeMenuChoose(choice, employeeService);
+//                } else {
+                    choose(1);
+//                }
                 break;
             case 2:
                 System.out.println("Nhập mã nhân viên cần sửa: ");
@@ -111,7 +120,8 @@ public class MenuService {
                 ;
                 break;
             case 3:
-                employeeService.delete();
+                boolean checkDelete = employeeService.delete();
+                choose(1);
 //                EmployeeService.deleteEmployee();
                 break;
             case 4:
@@ -155,6 +165,14 @@ public class MenuService {
                     System.out.println("\nKhông có nhân viên nào");
                 }
                 break;
+            case 9:
+                List<Employee> lstEmpSort = employeeService.sotedBySalary();
+                printEmpoyee(lstEmpSort);
+                break;
+                case 10:
+                    List<Employee> lstEmpByDep = employeeService.getListEmpByDepartment();
+                    printEmpoyee(lstEmpByDep);
+                    break;
             default:
                 System.out.println("Vui lòng nhập lại!");
                 break;
@@ -172,6 +190,7 @@ public class MenuService {
         System.out.println("2.Sửa phòng ban");
         System.out.println("3.Xóa phòng ban");
         System.out.println("4.Xem danh sách phòng ban");
+        System.out.println("6.Thay đổi quản lý phòng ban");
         System.out.println("5.Quay lại");
         System.out.println("--------------------");
         Scanner sc = new Scanner(System.in);
@@ -208,6 +227,9 @@ public class MenuService {
                 List<Department> lstDep = departmentService.getAll();
                 printDepartment(lstDep);
                 break;
+            case 6:
+                departmentService.changeDepartmentManager();
+                break;
         }
     }
 
@@ -225,19 +247,20 @@ public class MenuService {
     }
 
     private static void printEmpoyee(List<Employee> lstEmp){
-        System.out.println("-------------------------------------------------Danh sách nhân viên-------------------------------------------------------------------");
+        System.out.println("-------------------------------------------------Danh sách nhân viên-------------------------------------------------------------------------");
         System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s %-20s %-15s %-20s", "STT", "Mã NV", "Tên NV", "Ngày sinh", "Giới tính", "SDT","Lương", "Thuế", "Phòng ban", "Mã phòng ban","Chức vụ");
+        System.out.print("---------------------------------------------------------------------------------------------------------------------------------------------");
         for (int i = 0; i < lstEmp.size(); i++) {
             System.out.println();
             System.out.printf("%-5s %-10s %-20s %-10s %-10s %-15s %-10s %-10s %-20s %-15s %-20s",
                     i + 1, lstEmp.get(i).getCode(), lstEmp.get(i).getName(), lstEmp.get(i).getDateOfBirth(),
                     lstEmp.get(i).getGender() == 1 ? "Nam" : "Nữ",lstEmp.get(i).getPhone(),
-                    lstEmp.get(i).getSalary() != null ? lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN).toString(): null,
-                    lstEmp.get(i).getSalary() != null ? EmployeeService.getTax(lstEmp.get(i).getSalary()).toString() : null,
+                    lstEmp.get(i).getSalary() != null ? formatSalary(lstEmp.get(i).getSalary().setScale(0, ROUND_HALF_EVEN)): null,
+                    lstEmp.get(i).getSalary() != null ? formatSalary(EmployeeService.getTax(lstEmp.get(i).getSalary())) : null,
                     getDepName(lstEmp.get(i).getDepartmentID()).get("name"), getDepName(lstEmp.get(i).getDepartmentID()).get("code"),
                     checkIsManager(lstEmp.get(i).getIsManager())
                     );
-            System.out.print("\n-------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.print("\n------------------------------------------------------------------------------------------------------------------------------------------");
         }
         System.out.println();
     }
@@ -276,5 +299,11 @@ public class MenuService {
         }else {
             return "Quản lý";
         }
+    }
+
+    public static String formatSalary(BigDecimal salary) {
+        String pattern = "###,###.###";
+        DecimalFormat decimalFormat = new DecimalFormat(pattern);
+        return decimalFormat.format(salary);
     }
 }

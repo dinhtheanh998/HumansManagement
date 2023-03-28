@@ -50,21 +50,21 @@ public class Base<T> implements IBase<T> {
             } else {
                 CustomAno myCustomAnn = field.getAnnotation(CustomAno.class);
                 Validates myValidates = field.getAnnotation(Validates.class);
-                if(customCheck(tmp)) {
+                if (customCheck(tmp)) {
                     System.out.println("Nhập: " + valueAnonaLabel.value());
-                }else {
-                    if(myCustomAnn != null) {
+                } else {
+                    if (myCustomAnn != null) {
                         String unique = myCustomAnn.name();
-                        if(unique.equalsIgnoreCase("unique")) {
+                        if (unique.equalsIgnoreCase("unique")) {
                             continue;
                         }
-                    }else {
+                    } else {
                         System.out.println("Nhập: " + valueAnonaLabel.value());
                     }
                 }
                 field.setAccessible(true);
                 String nextLine = sc.nextLine();
-                if(nextLine.equalsIgnoreCase("exit")) {
+                if (nextLine.equalsIgnoreCase("exit")) {
                     return false;
                 }
                 if (myValidates != null) {
@@ -90,8 +90,14 @@ public class Base<T> implements IBase<T> {
             }
 
         }
-
-        return _baseDAO.add(tmp, isUpdate);
+        System.out.println("Bạn có muốn lưu không? (Y/N)");
+        String nextLine = sc.nextLine();
+        if (!nextLine.equalsIgnoreCase("y")) {
+            return false;
+        }else {
+            return _baseDAO.add(tmp, isUpdate);
+        }
+//        return _baseDAO.add(tmp, isUpdate);
     }
 
     private void printPclassFromAnonation(Class<?> pClass, T tmp, Scanner sc, Field field) throws IllegalAccessException {
@@ -129,7 +135,16 @@ public class Base<T> implements IBase<T> {
             }
             System.out.println("Nhập: " + field.getAnnotation(Label.class).value());
             String indexDepart = sc.nextLine();
-            if(indexDepart.equalsIgnoreCase("exit")){
+            if (!indexDepart.isEmpty()) {
+                while (!Helper.isNumeric(indexDepart) || Integer.parseInt(indexDepart) > listSize || Integer.parseInt(indexDepart) < 1) {
+                    System.out.println("Nhập lại: " + field.getAnnotation(Label.class).value());
+                    indexDepart = sc.nextLine();
+                    if(indexDepart.isEmpty()){
+                        break;
+                    }
+                }
+            }
+            if (indexDepart.equalsIgnoreCase("exit")) {
                 return;
             }
             field.setAccessible(true);
@@ -255,7 +270,7 @@ public class Base<T> implements IBase<T> {
                         System.out.println("Giá trị cũ: " + value);
                         System.out.print("Nhập giá trị mới: ");
                         nextLine = sc.nextLine();
-                        if(nextLine.equalsIgnoreCase("exit")){
+                        if (nextLine.equalsIgnoreCase("exit")) {
                             return false;
                         }
                         // kiểm tra xem người dùng có nhập gì không
@@ -290,12 +305,16 @@ public class Base<T> implements IBase<T> {
             System.out.println("Nhập mã cần xóa: ");
             Scanner sc = new Scanner(System.in);
             String code = sc.nextLine();
+            System.out.println("Bạn có muốn xóa nhân viên có mã" + code + "không? (Y/N)");
+            String confirm = sc.nextLine();
+            if (!confirm.equalsIgnoreCase("y")) {
+                return false;
+            }
             boolean isSucessfull = _baseDAO.delete(code);
             if (isSucessfull) {
                 System.out.println("Xóa thành công");
                 return true;
-            }
-            else {
+            } else {
                 throw new RuntimeException("Xóa thất bại");
             }
         } catch (Exception e) {

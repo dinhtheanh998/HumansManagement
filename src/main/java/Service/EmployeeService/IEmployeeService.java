@@ -16,4 +16,8 @@ public interface IEmployeeService extends IBase<Employee> {
     boolean changeDepartmentID();
 
     List<Employee> filter();
+
+    List<Employee> sotedBySalary();
+
+    List<Employee> getListEmpByDepartment();
 }
